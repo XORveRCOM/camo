@@ -60,12 +60,12 @@ func printRandomPattern(pat RandomPattern) {
 
 // TestMakeRandomPattern4 4bit新規パターンの作成
 func TestMakeRandomPattern4(t *testing.T) {
-	printRandomPattern(MakeRandomPatternP(16/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
+	printRandomPattern(MakeRandomPattern(16/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
 	t.Log()
 }
 
 // TestMakeRandomPattern8 8bit新規パターンの作成
 func TestMakeRandomPattern8(t *testing.T) {
-	printRandomPattern(MakeRandomPatternP(256/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
+	printRandomPattern(MakeRandomPattern(256/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
 	t.Log()
 }
