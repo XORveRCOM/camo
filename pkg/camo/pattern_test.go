@@ -1,7 +1,6 @@
 package camo
 
 import (
-	crand "crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -22,7 +21,7 @@ func (p *testPatternProvider) Length() int {
 }
 
 // check randomPattern の妥当性チェックを行う
-func (p *randomPattern) check(t *testing.T) {
+func (p *RandomPattern) check(t *testing.T) {
 	m := make(map[string]int)
 	for i := 0; i < p.Length(); i++ {
 		r := p.Pattern(byte(i))
@@ -44,66 +43,8 @@ func TestPattern(t *testing.T) {
 	compactPat().check(t)
 }
 
-// makeRandomPattern 乱数列マトリックスを新規作成
-func makeRandomPatternP(halfCnt int, s []int) randomPattern {
-	// 乱数列の生成
-	random := NewNonce()
-	ret := [][]byte{}
-	for i := 0; i < halfCnt; i++ {
-		ran := []byte{}
-		inv := []byte{}
-		for j := 0; j < s[i%len(s)]; j++ {
-			val := uint8(random.Nonce())
-			ran = append(ran, val)
-			inv = append(inv, ^val)
-		}
-		ret = append(ret, ran, inv)
-	}
-	// シャッフル
-	max := len(ret)
-	for i := 0; i < halfCnt*2; i++ {
-		from := int(random.Nonce()) % max
-		to := int(random.Nonce()) % max
-		ret[to], ret[from] = ret[from], ret[to]
-	}
-	return ret
-}
-
-// makeRandomPattern 乱数列マトリックスを新規作成
-func makeRandomPattern(halfCnt int, s []int) randomPattern {
-	var nonces = make([]byte, 1)
-	// 乱数列の生成
-	ret := [][]byte{}
-	for i := 0; i < halfCnt; i++ {
-		ran := []byte{}
-		inv := []byte{}
-		for j := 0; j < s[i%len(s)]; j++ {
-			// 安全な乱数を使う
-			cnt, err := crand.Read(nonces)
-			if cnt != cap(nonces) {
-				panic(fmt.Errorf("rand.Read() : cnt=%d", cnt))
-			} else if err != nil {
-				panic(fmt.Errorf("rand.Read() : %v", err))
-			}
-			val := uint8(nonces[0])
-			ran = append(ran, val)
-			inv = append(inv, ^val)
-		}
-		ret = append(ret, ran, inv)
-	}
-	// シャッフル
-	random := NewNonce()
-	max := len(ret)
-	for i := 0; i < halfCnt*2; i++ {
-		from := int(random.Nonce()) % max
-		to := int(random.Nonce()) % max
-		ret[to], ret[from] = ret[from], ret[to]
-	}
-	return ret
-}
-
 // printRandomPattern 乱数列マトリックスのソースコードを出力
-func printRandomPattern(pat randomPattern) {
+func printRandomPattern(pat RandomPattern) {
 	fmt.Println("\treturn &randomPattern{")
 	max := pat.Length()
 	for i := 0; i < max; i++ {
@@ -119,12 +60,12 @@ func printRandomPattern(pat randomPattern) {
 
 // TestMakeRandomPattern4 4bit新規パターンの作成
 func TestMakeRandomPattern4(t *testing.T) {
-	printRandomPattern(makeRandomPattern(16/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
+	printRandomPattern(MakeRandomPatternP(16/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
 	t.Log()
 }
 
 // TestMakeRandomPattern8 8bit新規パターンの作成
 func TestMakeRandomPattern8(t *testing.T) {
-	printRandomPattern(makeRandomPattern(256/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
+	printRandomPattern(MakeRandomPatternP(256/2, []int{53, 59, 61, 67, 71, 73, 79, 83}))
 	t.Log()
 }
